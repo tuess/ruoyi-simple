@@ -1,0 +1,3 @@
+# ruoyi-simple
+最精简的一个springboot版的ruoyi的demo
+只保留了ruoyi本来的sys_dept，sys_menu，sys_role，sys_user四张表，以及四张表的关系表，共七张表，其它的功能已被去除，可以作为项目的基本包来用
