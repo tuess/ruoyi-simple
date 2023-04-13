@@ -7,7 +7,6 @@ import com.huaxin.common.utils.sign.Base64;
 import com.huaxin.common.utils.uuid.IdUtils;
 import com.huaxin.framework.redis.RedisCache;
 import com.huaxin.framework.web.domain.AjaxResult;
-import com.huaxin.project.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.FastByteArrayOutputStream;
@@ -41,8 +40,9 @@ public class CaptchaController {
     @Value("${ruoyi.captchaType}")
     private String captchaType;
 
-    @Autowired
-    private ISysConfigService configService;
+    // 验证码是否开启
+    @Value("${ruoyi.captchaEnable}")
+    private Boolean captchaEnable;
 
     /**
      * 生成验证码
@@ -50,9 +50,8 @@ public class CaptchaController {
     @GetMapping("/captchaImage")
     public AjaxResult getCode(HttpServletResponse response) throws IOException {
         AjaxResult ajax = AjaxResult.success();
-        boolean captchaEnabled = configService.selectCaptchaEnabled();
-        ajax.put("captchaEnabled", captchaEnabled);
-        if (!captchaEnabled) {
+        ajax.put("captchaEnabled", captchaEnable);
+        if (!captchaEnable) {
             return ajax;
         }
 

@@ -4,7 +4,10 @@ import com.huaxin.common.constant.CacheConstants;
 import com.huaxin.common.constant.Constants;
 import com.huaxin.common.constant.UserConstants;
 import com.huaxin.common.exception.ServiceException;
-import com.huaxin.common.exception.user.*;
+import com.huaxin.common.exception.user.CaptchaException;
+import com.huaxin.common.exception.user.CaptchaExpireException;
+import com.huaxin.common.exception.user.UserNotExistsException;
+import com.huaxin.common.exception.user.UserPasswordNotMatchException;
 import com.huaxin.common.utils.DateUtils;
 import com.huaxin.common.utils.MessageUtils;
 import com.huaxin.common.utils.StringUtils;
@@ -15,9 +18,9 @@ import com.huaxin.framework.redis.RedisCache;
 import com.huaxin.framework.security.LoginUser;
 import com.huaxin.framework.security.context.AuthenticationContextHolder;
 import com.huaxin.project.system.domain.SysUser;
-import com.huaxin.project.system.service.ISysConfigService;
 import com.huaxin.project.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +36,11 @@ import javax.annotation.Resource;
  */
 @Component
 public class SysLoginService {
+
+    // 验证码是否开启
+    @Value("${ruoyi.captchaEnable}")
+    private Boolean captchaEnable;
+
     @Autowired
     private TokenService tokenService;
 
@@ -44,9 +52,6 @@ public class SysLoginService {
 
     @Autowired
     private ISysUserService userService;
-
-    @Autowired
-    private ISysConfigService configService;
 
     /**
      * 登录验证
@@ -96,8 +101,7 @@ public class SysLoginService {
      * @return 结果
      */
     public void validateCaptcha(String username, String code, String uuid) {
-        boolean captchaEnabled = configService.selectCaptchaEnabled();
-        if (captchaEnabled) {
+        if (captchaEnable) {
             String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + StringUtils.nvl(uuid, "");
             String captcha = redisCache.getCacheObject(verifyKey);
             redisCache.deleteObject(verifyKey);
@@ -137,11 +141,11 @@ public class SysLoginService {
             throw new UserPasswordNotMatchException();
         }
         // IP黑名单校验
-        String blackStr = configService.selectConfigByKey("sys.login.blackIPList");
-        if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr())) {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("login.blocked")));
-            throw new BlackListException();
-        }
+        //String blackStr = configService.selectConfigByKey("sys.login.blackIPList");
+        //if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr())) {
+        //    AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("login.blocked")));
+        //    throw new BlackListException();
+        //}
     }
 
     /**

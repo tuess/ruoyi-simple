@@ -1,19 +1,17 @@
 # 项目相关配置
 ruoyi:
-  # 名称
-  name: RuoYi
-  # 版本
-  version: 3.8.5
-  # 版权年份
-  copyrightYear: 2023
-  # 实例演示开关
-  demoEnabled: true
   # 文件路径 示例（ Windows配置D:/ruoyi/uploadPath，Linux配置 /home/ruoyi/uploadPath）
   profile: D:/ruoyi/uploadPath
   # 获取ip地址开关
   addressEnabled: false
+  # 验证码开关
+  captchaEnable: true
   # 验证码类型 math 数组计算 char 字符验证
   captchaType: math
+  # 注册是否开启
+  registerEnable: false
+  # 新用户初始密码
+  initPassword: 123456
 
 # 开发环境配置
 server:
@@ -62,11 +60,6 @@ spring:
       max-file-size: 10MB
       # 设置总上传的文件大小
       max-request-size: 20MB
-  # 服务模块
-  devtools:
-    restart:
-      # 热部署开关
-      enabled: true
   # redis 配置
   redis:
     # 地址
@@ -100,13 +93,11 @@ token:
   expireTime: 30
 
 # MyBatis配置
-mybatis:
+mybatis-plus:
   # 搜索指定包别名
   typeAliasesPackage: com.huaxin.project.**.domain
   # 配置mapper的扫描，找到所有的mapper.xml映射文件
   mapperLocations: classpath*:mybatis/**/*Mapper.xml
-  # 加载全局的配置文件
-  configLocation: classpath:mybatis/mybatis-config.xml
 
 # PageHelper分页插件
 pagehelper:

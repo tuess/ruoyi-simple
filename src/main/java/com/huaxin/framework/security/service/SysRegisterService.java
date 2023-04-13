@@ -13,9 +13,9 @@ import com.huaxin.framework.manager.factory.AsyncFactory;
 import com.huaxin.framework.redis.RedisCache;
 import com.huaxin.framework.security.RegisterBody;
 import com.huaxin.project.system.domain.SysUser;
-import com.huaxin.project.system.service.ISysConfigService;
 import com.huaxin.project.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,11 +25,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SysRegisterService {
-    @Autowired
-    private ISysUserService userService;
+
+    // 验证码是否开启
+    @Value("${ruoyi.captchaEnable}")
+    private Boolean captchaEnable;
 
     @Autowired
-    private ISysConfigService configService;
+    private ISysUserService userService;
 
     @Autowired
     private RedisCache redisCache;
@@ -43,8 +45,7 @@ public class SysRegisterService {
         sysUser.setUserName(username);
 
         // 验证码开关
-        boolean captchaEnabled = configService.selectCaptchaEnabled();
-        if (captchaEnabled) {
+        if (captchaEnable) {
             validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
         }
 

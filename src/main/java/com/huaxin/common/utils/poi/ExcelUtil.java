@@ -3,7 +3,6 @@ package com.huaxin.common.utils.poi;
 import com.huaxin.common.core.text.Convert;
 import com.huaxin.common.exception.UtilException;
 import com.huaxin.common.utils.DateUtils;
-import com.huaxin.common.utils.DictUtils;
 import com.huaxin.common.utils.StringUtils;
 import com.huaxin.common.utils.file.FileTypeUtils;
 import com.huaxin.common.utils.file.FileUtils;
@@ -354,8 +353,6 @@ public class ExcelUtil<T> {
                             propertyName = field.getName() + "." + attr.targetAttr();
                         } else if (StringUtils.isNotEmpty(attr.readConverterExp())) {
                             val = reverseByExp(Convert.toStr(val), attr.readConverterExp(), attr.separator());
-                        } else if (StringUtils.isNotEmpty(attr.dictType())) {
-                            val = reverseDictByExp(Convert.toStr(val), attr.dictType(), attr.separator());
                         } else if (!attr.handler().equals(ExcelHandlerAdapter.class)) {
                             val = dataFormatHandlerAdapter(val, attr);
                         } else if (ColumnType.IMAGE == attr.cellType() && StringUtils.isNotEmpty(pictures)) {
@@ -839,17 +836,10 @@ public class ExcelUtil<T> {
                 String dateFormat = attr.dateFormat();
                 String readConverterExp = attr.readConverterExp();
                 String separator = attr.separator();
-                String dictType = attr.dictType();
                 if (StringUtils.isNotEmpty(dateFormat) && StringUtils.isNotNull(value)) {
                     cell.setCellValue(parseDateToStr(dateFormat, value));
                 } else if (StringUtils.isNotEmpty(readConverterExp) && StringUtils.isNotNull(value)) {
                     cell.setCellValue(convertByExp(Convert.toStr(value), readConverterExp, separator));
-                } else if (StringUtils.isNotEmpty(dictType) && StringUtils.isNotNull(value)) {
-                    if (!sysDictMap.containsKey(dictType + value)) {
-                        String lable = convertDictByExp(Convert.toStr(value), dictType, separator);
-                        sysDictMap.put(dictType + value, lable);
-                    }
-                    cell.setCellValue(sysDictMap.get(dictType + value));
                 } else if (value instanceof BigDecimal && -1 != attr.scale()) {
                     cell.setCellValue((((BigDecimal) value).setScale(attr.scale(), attr.roundingMode())).doubleValue());
                 } else if (!attr.handler().equals(ExcelHandlerAdapter.class)) {
@@ -1000,30 +990,6 @@ public class ExcelUtil<T> {
             }
         }
         return StringUtils.stripEnd(propertyString.toString(), separator);
-    }
-
-    /**
-     * 解析字典值
-     *
-     * @param dictValue 字典值
-     * @param dictType  字典类型
-     * @param separator 分隔符
-     * @return 字典标签
-     */
-    public static String convertDictByExp(String dictValue, String dictType, String separator) {
-        return DictUtils.getDictLabel(dictType, dictValue, separator);
-    }
-
-    /**
-     * 反向解析值字典值
-     *
-     * @param dictLabel 字典标签
-     * @param dictType  字典类型
-     * @param separator 分隔符
-     * @return 字典值
-     */
-    public static String reverseDictByExp(String dictLabel, String dictType, String separator) {
-        return DictUtils.getDictValue(dictType, dictLabel, separator);
     }
 
     /**

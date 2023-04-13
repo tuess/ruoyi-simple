@@ -60,7 +60,7 @@ public interface SysMenuMapper {
     /**
      * 根据用户ID查询菜单
      *
-     * @param username 用户ID
+     * @param userId 用户ID
      * @return 菜单列表
      */
     List<SysMenu> selectMenuTreeByUserId(Long userId);

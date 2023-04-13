@@ -5,8 +5,8 @@ import com.huaxin.framework.security.RegisterBody;
 import com.huaxin.framework.security.service.SysRegisterService;
 import com.huaxin.framework.web.controller.BaseController;
 import com.huaxin.framework.web.domain.AjaxResult;
-import com.huaxin.project.system.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,15 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class SysRegisterController extends BaseController {
+
+    // 注册是否开启
+    @Value("${ruoyi.registerEnable}")
+    private Boolean registerEnable;
+
     @Autowired
     private SysRegisterService registerService;
 
-    @Autowired
-    private ISysConfigService configService;
-
     @PostMapping("/register")
     public AjaxResult register(@RequestBody RegisterBody user) {
-        if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {
+        if (!registerEnable) {
             return error("当前系统没有开启注册功能！");
         }
         String msg = registerService.register(user);
